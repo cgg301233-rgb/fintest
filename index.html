@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>FinTest — Финансовый тренажёр</title>
+  <style>
+    :root {
+      --bg: #f1f5fc;
+      --card-bg: rgba(255,255,255,0.96);
+      --text: #1f3a5f;
+      --heading: #1e2f5e;
+      --sub: #5b6e8c;
+      --btn-bg: #f8faff;
+      --btn-border: #e9eef4;
+      --btn-hover: #eef3fe;
+      --btn-primary: #1e4668;
+      --btn-primary-hover: #0f3555;
+      --pane-bg: #ffffff;
+      --pane-border: #eef2f8;
+      --opt-bg: #fbfdff;
+      --opt-border: #e2e9f2;
+      --opt-hover-bg: #ecf5ff;
+      --opt-hover-border: #bdd3f0;
+      --fb-bg: #f8fafd;
+      --correct-bg: #e2f3e4;
+      --correct-text: #1c6e2a;
+      --wrong-bg: #ffe9e9;
+      --wrong-text: #b13e3e;
+      --stats-bg: #f0f4fa;
+      --shadow: 0 20px 40px rgba(0,0,0,0.05);
+      --modal-bg: rgba(0,0,0,0.5);
+      --input-border: #cad2db;
+      --chart-border: #e9eef4;
+      --toggle-bg: #87ceeb;
+      --toggle-dark-bg: #3a3b5c;
+      --transition: 0.3s;
+      --font: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      --user-bg: #eef3fc;
+      --user-text: #2c6e9e;
+    }
+    body.dark {
+      --bg: #1a1d23;
+      --card-bg: #252830;
+      --text: #e0e0e0;
+      --heading: #b0c4f0;
+      --sub: #8a94a6;
+      --btn-bg: #2f333a;
+      --btn-border: #3f434c;
+      --btn-hover: #3a3f48;
+      --btn-primary: #3f6180;
+      --btn-primary-hover: #2c4a60;
+      --pane-bg: #2c3038;
+      --pane-border: #3f434c;
+      --opt-bg: #2f333a;
+      --opt-border: #4a4f58;
+      --opt-hover-bg: #3d434d;
+      --opt-hover-border: #5f6570;
+      --fb-bg: #2f333a;
+      --correct-bg: #1a3a2a;
+      --correct-text: #7ddf90;
+      --wrong-bg: #3a1a1a;
+      --wrong-text: #e07070;
+      --stats-bg: #2f333a;
+      --shadow: 0 20px 40px rgba(0,0,0,0.3);
+      --modal-bg: rgba(0,0,0,0.7);
+      --input-border: #4a4f58;
+      --chart-border: #3f434c;
+      --toggle-bg: #3a3b5c;
+      --toggle-dark-bg: #87ceeb;
+      --user-bg: #2f333a;
+      --user-text: #a0c0f0;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: var(--font); }
+    body { background: var(--bg); min-height: 100vh; padding: 24px 16px; transition: background var(--transition); }
+    .app-card { max-width: 860px; margin: 0 auto; background: var(--card-bg); border-radius: 40px; box-shadow: var(--shadow); padding: 28px 24px; transition: background var(--transition), box-shadow var(--transition); position: relative; }
+    h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #1e2f5e, #2a4b7a); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .sub { color: var(--sub); font-weight: 500; margin-bottom: 28px; border-left: 3px solid #2a7faa; padding-left: 12px; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 20px 0 12px; }
+    .btn { border: none; background: var(--btn-bg); padding: 14px 16px; border-radius: 28px; font-weight: 600; font-size: 0.95rem; color: var(--text); transition: 0.2s; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid var(--btn-border); text-align: center; }
+    .btn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+    .btn-primary { background: var(--btn-primary); color: white; border: none; }
+    .btn-primary:hover { background: var(--btn-primary-hover); }
+    .question-pane { background: var(--pane-bg); border-radius: 32px; padding: 24px; margin: 18px 0 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.02); border: 1px solid var(--pane-border); }
+    .q-text { font-size: 1.35rem; font-weight: 600; line-height: 1.4; color: var(--text); margin: 12px 0 24px; }
+    .options-list { display: flex; flex-direction: column; gap: 12px; }
+    .opt-btn { text-align: left; padding: 14px 18px; background: var(--opt-bg); border: 1.5px solid var(--opt-border); border-radius: 28px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: 0.15s; color: var(--text); }
+    .opt-btn:hover { background: var(--opt-hover-bg); border-color: var(--opt-hover-border); transform: translateX(5px); }
+    .opt-btn:disabled { opacity:0.7; cursor:default; transform:none; }
+    .feedback { margin-top: 20px; padding: 16px 20px; border-radius: 28px; line-height: 1.5; font-size: 0.95rem; background: var(--fb-bg); }
+    .correct-fb { background: var(--correct-bg); color: var(--correct-text); border-left: 5px solid #2b9348; }
+    .wrong-fb { background: var(--wrong-bg); color: var(--wrong-text); border-left: 5px solid #dc5a5a; }
+    .stats-bar { display: flex; justify-content: space-between; background: var(--stats-bg); padding: 12px 20px; border-radius: 60px; font-weight: 600; margin-bottom: 20px; }
+    .result-screen { text-align: center; padding: 28px; }
+    .big-score { font-size: 3.5rem; font-weight: 800; color: var(--btn-primary); margin: 10px 0; }
+    .grid-2 { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 24px; }
+    .user-name { text-align: right; font-weight: 500; color: var(--user-text); background: var(--user-bg); display: inline-block; padding: 6px 16px; border-radius: 40px; font-size: 0.85rem; margin-bottom: 12px; }
+    .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--modal-bg); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-card { background: var(--card-bg); max-width: 400px; width: 90%; padding: 28px; border-radius: 40px; text-align: center; box-shadow: 0 20px 35px rgba(0,0,0,0.2); }
+    .modal-card input { width: 100%; padding: 14px; border-radius: 100px; border: 1px solid var(--input-border); font-size: 1rem; margin: 20px 0; background: var(--pane-bg); color: var(--text); }
+    .theme-toggle { position: absolute; top: 16px; right: 16px; }
+    .toggle-label { position: relative; display: inline-block; width: 56px; height: 28px; }
+    .toggle-label input { opacity:0; width:0; height:0; }
+    .slider { position: absolute; cursor: pointer; top:0; left:0; right:0; bottom:0; background: var(--toggle-bg); transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-radius: 34px; box-shadow: inset 0 0 8px rgba(0,0,0,0.15); }
+    .slider:before { content: ""; position: absolute; height: 22px; width: 22px; left: 3px; bottom: 3px; background: white; transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.25); z-index: 2; }
+    .slider-icons { position: absolute; top:0; left:0; width:100%; height:100%; display: flex; justify-content: space-between; align-items: center; padding: 0 6px; font-size: 14px; pointer-events: none; z-index: 1; }
+    .slider-icons .sun, .slider-icons .moon { transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+    .slider-icons .sun { opacity:1; }
+    .slider-icons .moon { opacity:0.5; }
+    input:checked + .slider { background: var(--toggle-dark-bg); }
+    input:checked + .slider:before { transform: translateX(28px); }
+    input:checked + .slider .slider-icons .sun { opacity:0.5; transform: scale(0.8); }
+    input:checked + .slider .slider-icons .moon { opacity:1; transform: scale(1.2); }
+    .chart-image { max-width:100%; height:auto; border-radius:14px; margin-bottom:20px; border:1px solid var(--chart-border); }
+  </style>
+</head>
+<body>
+<div class="app-card" id="app"></div>
+<script>
+  // Глобальный обработчик ошибок
+  window.onerror = function(message, source, lineno, colno, error) {
+    alert("Произошла ошибка в приложении. Пожалуйста, перезагрузите страницу.");
+    console.error(message, source, lineno, colno, error);
+    return true;
+  };
+
+  // Безопасный localStorage
+  const safeGet = (key) => { try { return localStorage.getItem(key); } catch(e) { return null; } };
+  const safeSet = (key, value) => { try { localStorage.setItem(key, value); } catch(e) { console.warn("localStorage не доступен"); } };
+
+  // Пользователь и статистика
+  let currentUser = null;
+  const getStats = () => { const raw = safeGet("fintest_stats"); return raw ? JSON.parse(raw) : { totalTests:0, bestScore:0, bestTotal:0, lastScore:0, lastTotal:0, avgAcc:0, maxStreak:0, completedLevels:[] }; };
+  const saveStats = (s) => safeSet("fintest_stats", JSON.stringify(s));
+  const updateUserProfile = (score, total, diff) => {
+    let s = getStats();
+    s.totalTests = (s.totalTests||0)+1; s.lastScore = score; s.lastTotal = total;
+    if (score > (s.bestScore||0)) { s.bestScore = score; s.bestTotal = total; }
+    s.avgAcc = ((s.avgAcc * (s.totalTests-1)) + (score/total)) / s.totalTests;
+    if (score === total && !s.completedLevels.includes(diff)) s.completedLevels.push(diff);
+    saveStats(s);
+  };
+  const updateMaxStreak = (streak) => { let s = getStats(); if (streak > (s.maxStreak||0)) s.maxStreak = streak; saveStats(s); };
+  const getAchievements = () => {
+    const s = getStats();
+    const a = [];
+    if (s.completedLevels?.length >= 3) a.push("🧠 Знаток (все уровни 10/10)");
+    if (s.maxStreak >= 5) a.push("🔥 5 верных подряд");
+    if (s.maxStreak >= 10) a.push("🔥 10 верных подряд");
+    if (s.bestScore === s.bestTotal && s.bestTotal >= 10) a.push("🎯 10/10");
+    return a;
+  };
+
+  // Безопасный рендер
+  const safeRender = (elementId, html) => {
+    const el = document.getElementById(elementId);
+    if (el) { el.innerHTML = ''; el.innerHTML = html; }
+  };
+
+  // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+  const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const shuffleArray = (arr) => { for (let i=arr.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; } return arr; };
+  const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+
+  const WOMEN_NAMES = ["София","Ева","Анна","Мария","Алиса","Ксения","Василиса","Дарья","Полина","Елизавета","Милана","Вера","Амелия","Александра","Анастасия"];
+  const MEN_NAMES = ["Михаил","Матвей","Тимофей","Артём","Марк","Максим","Александр","Роман","Иван","Даниил","Никита","Алексей","Богдан","Егор","Владислав"];
+  const randName = () => { const isMale = Math.random() < 0.5; return { name: isMale ? MEN_NAMES[Math.floor(Math.random()*MEN_NAMES.length)] : WOMEN_NAMES[Math.floor(Math.random()*WOMEN_NAMES.length)], isMale }; };
+  const ITEMS = { "книга":[10,30], "настольная игра":[5,40], "смартфон":[400,4000], "билет в кино":[15,25], "чайник":[80,150], "обед в кафе":[30,70], "зимняя куртка":[150,300], "горный велосипед":[500,1200], "робот-пылесос":[800,3600], "монитор":[270,890] };
+  const ITEM_NAMES = Object.keys(ITEMS);
+
+  // База вопросов (60 шт.)
+  const RAW_QUESTIONS = [
+    // Hard (20)
+    {"level":"hard","type":"quiz","text":"Что такое диверсификация инвестиций?","options":["Вложение всех средств в один актив","Распределение средств между разными активами","Покупка только гособлигаций","Хранение денег дома в разной валюте"],"answer":"Распределение средств между разными активами","explanation":"Диверсификация снижает риски."},
+    {"level":"hard","type":"quiz","text":"Какая организация отвечает за денежно-кредитную политику в Беларуси?","options":["Министерство финансов","Национальный банк РБ","Совет министров","Евразийский банк развития"],"answer":"Национальный банк РБ","explanation":"Нацбанк регулирует эмиссию денег и учётную ставку."},
+    {"level":"hard","type":"quiz","text":"Что является пассивным доходом?","options":["Зарплата","Премия","Проценты по вкладу","Оплата сверхурочных"],"answer":"Проценты по вкладу","explanation":"Пассивный доход не требует постоянного активного участия."},
+    {"level":"hard","type":"quiz","text":"Что такое инфляция?","options":["Рост цен на товары и услуги","Падение курса валюты","Увеличение экспорта","Снижение налогов"],"answer":"Рост цен на товары и услуги","explanation":"Инфляция — устойчивое повышение общего уровня цен."},
+    {"level":"hard","type":"quiz","text":"Какой отчёт показывает прибыль компании за период?","options":["Баланс","Отчёт о движении денежных средств","Отчёт о прибылях и убытках","Уставной капитал"],"answer":"Отчёт о прибылях и убытках","explanation":"Отражает доходы, расходы и конечный финансовый результат."},
+    {"level":"hard","type":"quiz","text":"Что такое ликвидность актива?","options":["Способность быстро продать по рыночной цене","Доходность актива","Надёжность эмитента","Срок погашения облигации"],"answer":"Способность быстро продать по рыночной цене","explanation":"Ликвидность — возможность быстро превратить актив в деньги."},
+    {"level":"hard","type":"quiz","text":"Что такое ставка рефинансирования?","options":["Ставка по депозитам физлиц","Ставка кредитования коммерческих банков","Курс доллара","Налог на прибыль банков"],"answer":"Ставка кредитования коммерческих банков","explanation":"Ставка рефинансирования — основной инструмент денежно-кредитной политики Нацбанка."},
+    {"level":"hard","type":"quiz","text":"Какая мера не защищает от кибермошенничества?","options":["Двухфакторная аутентификация","Сложные пароли","Публикация реквизитов в соцсетях","Проверка адресной строки"],"answer":"Публикация реквизитов в соцсетях","explanation":"Разглашение конфиденциальных данных повышает риск."},
+    {"level":"hard","type":"quiz","text":"Что такое сложный процент?","options":["Процент только на первоначальную сумму","Процент на сумму и накопленные проценты","Фиксированная надбавка к зарплате","Комиссия за ведение счёта"],"answer":"Процент на сумму и накопленные проценты","explanation":"Сложный процент ускоряет рост капитала благодаря капитализации."},
+    {"level":"hard","type":"quiz","text":"Что является активом предприятия?","options":["Кредиторская задолженность","Уставный капитал","Оборудование","Прибыль"],"answer":"Оборудование","explanation":"Активы — ресурсы, от которых ожидается экономическая выгода."},
+    {"level":"hard","type":"quiz","text":"Кто страхует банковские вклады в Беларуси?","options":["Национальный банк","Агентство по гарантированному возмещению вкладов","Министерство финансов","Каждый банк сам"],"answer":"Агентство по гарантированному возмещению вкладов","explanation":"Государственное агентство гарантирует возврат вкладов физлиц."},
+    {"level":"hard","type":"quiz","text":"Что такое кредитная история?","options":["Список всех банков","Информация об исполнении обязательств по кредитам","Отчёт о доходах","Справка с работы"],"answer":"Информация об исполнении обязательств по кредитам","explanation":"Кредитная история влияет на возможность получить новый заём."},
+    {"level":"hard","type":"quiz","text":"Что такое ИНН?","options":["Идентификационный номер налогоплательщика","Индивидуальный номерной знак","Индекс национальной недвижимости","Институт народного наблюдения"],"answer":"Идентификационный номер налогоплательщика","explanation":"ИНН присваивается для учёта налоговых обязательств."},
+    {"level":"hard","type":"quiz","text":"Как расшифровывается ЦБ?","options":["Центральный банк","Целевой баланс","Цифровой билет","Ценовая биржа"],"answer":"Центральный банк","explanation":"Центральный банк регулирует денежную систему страны."},
+    {"level":"hard","type":"quiz","text":"Что такое девальвация?","options":["Снижение курса национальной валюты","Рост цен на продукты","Увеличение золотого запаса","Повышение ключевой ставки"],"answer":"Снижение курса национальной валюты","explanation":"Девальвация — официальное удешевление валюты."},
+    {"level":"hard","type":"quiz","text":"Что такое ВВП?","options":["Валовой внутренний продукт","Внешний валютный платёж","Временное валютное правило","Вексель внутреннего пользования"],"answer":"Валовой внутренний продукт","explanation":"ВВП — общая стоимость товаров и услуг, произведённых в стране."},
+    {"level":"hard","type":"quiz","text":"Какой платёж является обязательным для всех граждан?","options":["Кредит","Налог","Инвестиция","Страховка"],"answer":"Налог","explanation":"Налоги обязательны и установлены законодательством."},
+    {"level":"hard","type":"quiz","text":"Что из перечисленного является ценной бумагой?","options":["Акция","Кредитная карта","Сберегательная книжка","Паспорт"],"answer":"Акция","explanation":"Акция даёт право на долю в компании и дивиденды."},
+    {"level":"hard","type":"quiz","text":"Что такое бюджетный дефицит?","options":["Превышение расходов над доходами","Равенство доходов и расходов","Превышение доходов над расходами","Отсутствие налогов"],"answer":"Превышение расходов над доходами","explanation":"Дефицит бюджета возникает, когда государство тратит больше, чем зарабатывает."},
+    {"level":"hard","type":"quiz","text":"Что является функцией центрального банка?","options":["Выдача кредитов населению","Эмиссия национальной валюты","Управление пенсионными фондами","Сбор налогов"],"answer":"Эмиссия национальной валюты","explanation":"Центральный банк обладает монополией на выпуск денег."},
+    // Middle (10)
+    {"level":"middle","type":"quiz","text":"Как называется график ежемесячных платежей по кредиту, в котором сумма одинакова каждый месяц?","options":["Дифференцированный","Аннуитетный","Сезонный","Переменный"],"answer":"Аннуитетный","explanation":"При аннуитетном графике вы каждый месяц платите одну и ту же сумму."},
+    {"level":"middle","type":"quiz","text":"Что такое полная стоимость кредита?","options":["Только сумма основного долга","Проценты за первый месяц","Все платежи по кредиту, включая проценты и комиссии","Страховка по кредиту"],"answer":"Все платежи по кредиту, включая проценты и комиссии","explanation":"ПСК показывает, сколько всего вы заплатите банку."},
+    {"level":"middle","type":"quiz","text":"Если вы просрочили платёж по кредиту, что может произойти в первую очередь?","options":["Банк сразу подаст в суд","Начислят штраф или пеню","Автоматически продлят срок кредита","Ничего не произойдёт"],"answer":"Начислят штраф или пеню","explanation":"За каждый день просрочки банк начисляет неустойку."},
+    {"level":"middle","type":"quiz","text":"Что такое поручитель по кредиту?","options":["Человек, который даёт деньги в долг","Человек, который гарантирует возврат кредита, если заёмщик не платит","Сотрудник банка, оформляющий кредит","Тот, кто проверяет кредитную историю"],"answer":"Человек, который гарантирует возврат кредита, если заёмщик не платит","explanation":"Поручитель берёт на себя обязательства по кредиту наравне с заёмщиком."},
+    {"level":"middle","type":"quiz","text":"Чем кредитная карта отличается от дебетовой?","options":["Кредитную можно использовать только в интернете","Дебетовая карта позволяет тратить только свои деньги, кредитная — деньги банка","Кредитная карта всегда золотая, дебетовая — синяя","Нет разницы"],"answer":"Дебетовая карта позволяет тратить только свои деньги, кредитная — деньги банка","explanation":"По кредитной карте вы пользуетесь заёмными средствами."},
+    {"level":"middle","type":"quiz","text":"Что такое «льготный период» по кредитной карте?","options":["Период, когда проценты не начисляются, если долг погашен полностью","Время, когда можно не платить вообще","Срок действия карты","Время оформления карты"],"answer":"Период, когда проценты не начисляются, если долг погашен полностью","explanation":"Грейс-период позволяет избежать процентов."},
+    {"level":"middle","type":"quiz","text":"Что такое кэшбэк?","options":["Возврат части потраченных денег на карту","Комиссия за снятие наличных","Плата за обслуживание карты","Штраф за просрочку"],"answer":"Возврат части потраченных денег на карту","explanation":"Кэшбэк — возврат процента от суммы покупок."},
+    {"level":"middle","type":"quiz","text":"Что такое депозит?","options":["Деньги, которые банк даёт в долг","Сумма, размещённая в банке под проценты","Способ оплаты в магазине","Вид налога"],"answer":"Сумма, размещённая в банке под проценты","explanation":"Депозит позволяет получать пассивный доход от накоплений."},
+    {"level":"middle","type":"quiz","text":"Какой бюджет считается сбалансированным?","options":["Доходы равны расходам","Доходы больше расходов","Расходы больше доходов","Отсутствие любых трат"],"answer":"Доходы равны расходам","explanation":"Сбалансированный бюджет — это равновесие поступлений и трат."},
+    {"level":"middle","type":"quiz","text":"Что такое финансовая подушка безопасности?","options":["Способ спрятать деньги дома","Запас денег на случай непредвиденных расходов","Кредит на большую сумму","Ежемесячная премия"],"answer":"Запас денег на случай непредвиденных расходов","explanation":"Финансовая подушка помогает пережить потерю дохода или срочные траты."},
+    // Easy (30)
+    {"level":"easy","type":"quiz","text":"Продолжи пословицу: «Копейка рубль...»","options":["бережёт","теряет","обгоняет","красит"],"answer":"бережёт","explanation":"Копейка рубль бережёт — даже мелкие сбережения важны."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «В кошельке они лежат, на них что-то купить хотят»","options":["Деньги","Фантики","Билеты","Скрепки"],"answer":"Деньги","explanation":"Деньги — средство для покупок."},
+    {"level":"easy","type":"quiz","text":"Что значит «не всё то золото, что блестит»?","options":["Не всякая дорогая вещь полезна","Золото всегда блестит","Блестящее — всегда дорогое","Нужно покупать только золото"],"answer":"Не всякая дорогая вещь полезна","explanation":"Не стоит судить о ценности только по внешнему виду."},
+    {"level":"easy","type":"quiz","text":"Как называют человека, который тратит деньги необдуманно?","options":["Транжира","Эконом","Банкир","Инвестор"],"answer":"Транжира","explanation":"Транжира — тот, кто легко расстаётся с деньгами."},
+    {"level":"easy","type":"quiz","text":"Какой сказочный герой закопал пять золотых монет?","options":["Буратино","Чебурашка","Колобок","Незнайка"],"answer":"Буратино","explanation":"Буратино закопал монеты на Поле Чудес."},
+    {"level":"easy","type":"quiz","text":"Для чего нужны деньги?","options":["Для покупки товаров и услуг","Для украшения стен","Только чтобы копить","Для игры"],"answer":"Для покупки товаров и услуг","explanation":"Деньги — универсальное средство обмена."},
+    {"level":"easy","type":"quiz","text":"Как называется сумма, которую мы тратим на что-то?","options":["Доход","Расход","Прибыль","Зарплата"],"answer":"Расход","explanation":"Расходы — это то, что мы тратим."},
+    {"level":"easy","type":"quiz","text":"Где безопаснее всего хранить сбережения?","options":["Под матрасом","В надёжном банке","В копилке без замка","На виду у всех"],"answer":"В надёжном банке","explanation":"Банк обеспечивает сохранность и защиту средств."},
+    {"level":"easy","type":"quiz","text":"Что из этого не является деньгами?","options":["Монеты","Банкноты","Камешки с улицы","Электронные деньги"],"answer":"Камешки с улицы","explanation":"Деньги — это общепринятое средство обмена."},
+    {"level":"easy","type":"quiz","text":"Что такое карманные деньги?","options":["Деньги, которые родители дают ребёнку на мелкие расходы","Крупная сумма для инвестиций","Долги","Налоги"],"answer":"Деньги, которые родители дают ребёнку на мелкие расходы","explanation":"Карманные деньги учат основам финансовой грамотности."},
+    {"level":"easy","type":"quiz","text":"Что такое скидка?","options":["Увеличение цены","Уменьшение цены","Обмен товара","Подарок"],"answer":"Уменьшение цены","explanation":"Скидка помогает купить товар дешевле."},
+    {"level":"easy","type":"quiz","text":"Как называется человек, который покупает товар?","options":["Продавец","Покупатель","Кассир","Банкир"],"answer":"Покупатель","explanation":"Покупатель — тот, кто приобретает товар или услугу."},
+    {"level":"easy","type":"quiz","text":"Что лучше сделать с деньгами, которые хочешь сохранить?","options":["Потратить все сразу","Положить в банк под проценты","Раздать всем друзьям","Спрятать на улице"],"answer":"Положить в банк под проценты","explanation":"Банковский вклад позволяет не только сохранить, но и приумножить сбережения."},
+    {"level":"easy","type":"quiz","text":"Закончи пословицу: «Без копейки … не бывает».","options":["рубля","доллара","евро","миллиона"],"answer":"рубля","explanation":"Копейка — часть рубля."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «Круглое, маленькое, в кошельке звенит».","options":["Монета","Купюра","Карта","Чек"],"answer":"Монета","explanation":"Монеты звенят."},
+    {"level":"easy","type":"quiz","text":"У Саши было 2 рубля. Он купил ластик за 80 копеек. Сколько денег осталось?","options":["1 р. 20 коп","1 рубль","50 коп","2 рубля"],"answer":"1 р. 20 коп","explanation":"2 руб. – 80 коп. = 1 руб. 20 коп."},
+    {"level":"easy","type":"quiz","text":"Закончи пословицу: «Скупой платит …»","options":["дважды","один раз","никогда","часто"],"answer":"дважды","explanation":"Скупому приходится переплачивать."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «Что дают в магазине, если денег дано больше, чем нужно?»","options":["Сдача","Подарок","Чек","Купюра"],"answer":"Сдача","explanation":"Излишек возвращают сдачей."},
+    {"level":"easy","type":"quiz","text":"У Кати 3 монеты по 5 копеек. Сколько всего копеек?","options":["10","15","20","8"],"answer":"15","explanation":"3 × 5 = 15 копеек."},
+    {"level":"easy","type":"quiz","text":"Закончи пословицу: «Не имей сто рублей, а имей сто …»","options":["друзей","монет","книг","машин"],"answer":"друзей","explanation":"Друзья важнее денег."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «В кошельке лежат бумажки, каждая имеет цену».","options":["Купюры","Монеты","Карты","Чеки"],"answer":"Купюры","explanation":"Бумажные деньги — купюры."},
+    {"level":"easy","type":"quiz","text":"Мама дала Пете 3 рубля. Он купил ручку за 1 р. 50 коп. и карандаш за 70 коп. Сколько сдачи?","options":["50 коп","80 коп","1 рубль","20 коп"],"answer":"80 коп","explanation":"1.50 + 0.70 = 2.20; 3.00 – 2.20 = 80 коп."},
+    {"level":"easy","type":"quiz","text":"Закончи пословицу: «Бережливость лучше …»","options":["богатства","бедности","жадности","щедрости"],"answer":"богатства","explanation":"Бережливость помогает копить."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «Маленький домик для денег, который носят в кармане или сумке».","options":["Кошелёк","Копилка","Банк","Ящик"],"answer":"Кошелёк","explanation":"Кошелёк — хранилище для денег."},
+    {"level":"easy","type":"quiz","text":"Сколько монет по 10 копеек нужно, чтобы получить 1 рубль?","options":["5","10","20","50"],"answer":"10","explanation":"1 рубль = 100 копеек, 100 / 10 = 10 монет."},
+    {"level":"easy","type":"quiz","text":"Петя купил шоколадный батончик за 2 рубля и сок за 1 рубль 80 копеек. Сколько он потратил?","options":["3 р. 80 коп","4 рубля","2 р. 50 коп","5 рублей"],"answer":"3 р. 80 коп","explanation":"2.00 + 1.80 = 3 руб. 80 коп."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «Что у монеты есть, а у купюры нет? Оно бывает ребристым или гладким».","options":["Гурт","Цифра","Герб","Номинал"],"answer":"Гурт","explanation":"Гурт — ребро монеты."},
+    {"level":"easy","type":"quiz","text":"Закончи пословицу: «Деньги как вода: …»","options":["уплывают","приходят","кипят","замерзают"],"answer":"уплывают","explanation":"Деньги быстро тратятся."},
+    {"level":"easy","type":"quiz","text":"У Маши есть купюра 5 рублей и 4 монеты по 50 копеек. Сколько всего денег у Маши?","options":["6 рублей","7 рублей","8 рублей","9 рублей"],"answer":"7 рублей","explanation":"5 руб. + 4×0.50 = 7 рублей."},
+    {"level":"easy","type":"quiz","text":"Отгадай загадку: «Я в кошельке, но не деньги. Я пластиковая, но не игрушка. Что я?»","options":["Карта","Банкнота","Монета","Чек"],"answer":"Карта","explanation":"Пластиковая банковская карта."}
+  ];
+
+  // ===== БЫСТРЫЙ ВЫБОР КРАТНОГО ЧИСЛА =====
+  const generatePrice = (item) => { let [lo,hi]=ITEMS[item]; let p=randInt(lo,hi); return p>=1500 ? Math.round(p/5)*5 : p; };
+  const generateOptions = (correct) => {
+    let set = new Set([String(correct)]);
+    while (set.size<4) { let delta = Math.max(1, Math.floor(correct*(Math.random()*0.2+0.05))); let v = Math.random()>0.5 ? correct+delta : Math.max(1, correct-delta); set.add(String(v)); }
+    return shuffleArray(Array.from(set));
+  };
+
+  function pickStepValue(lo, hi, step) {
+    const min = Math.ceil(lo / step) * step;
+    const max = Math.floor(hi / step) * step;
+    if (min > max) return lo;
+    const count = Math.floor((max - min) / step) + 1;
+    return min + step * randInt(0, count - 1);
+  }
+
+  const pickCleanPrice = (item, percent, maxPrice = Infinity) => {
+    let [lo,hi] = ITEMS[item];
+    hi = Math.min(hi, maxPrice);
+    const step = 100 / gcd(100, percent);
+    return pickStepValue(lo, hi, step);
+  };
+
+  const pickCleanDeposit = (min, max, rate, years) => {
+    const step = 100 / gcd(100, rate * years);
+    return pickStepValue(min, max, step);
+  };
+
+  // ===== ГЕНЕРАТОР ДИНАМИЧЕСКИХ ЗАДАЧ =====
+  const generateDynamicQuestion = (difficulty, streak=0) => {
+    const types = ["discount_find_original","discount_find_final","simple_interest","tax_calc","budget_split","cashback","currency_exchange","vat_calc","installment","inflation","savings_goal_months","loan_interest","compound_2y"];
+    let type = types[Math.floor(Math.random()*types.length)];
+
+    try {
+        if (type==="discount_find_original" || type==="discount_find_final") {
+            let item, percent, price, discount, discounted;
+            let attempts = 0;
+            do {
+                item = ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)];
+                percent = randInt(5, 35);
+                const maxPriceForDiscount = Math.floor(300 * 100 / percent);
+                price = pickCleanPrice(item, percent, maxPriceForDiscount);
+                discount = price * percent / 100;
+                attempts++;
+                if (attempts > 50) { item = "книга"; percent = 10; price = ITEMS["книга"][0]; discount = price * percent / 100; break; }
+            } while (discount > 300);
+            discounted = price - discount;
+            if (type==="discount_find_original") {
+                return {text:`${item} продаётся за ${discounted} руб. со скидкой ${percent}%. Сколько рублей составляла первоначальная цена?`, answer:String(price), options:generateOptions(price), explanation:`Цена со скидкой — ${100-percent}% от исходной. Исходная = ${discounted} / ${100-percent} * 100 = ${price} руб.`, type:"math"};
+            } else {
+                return {text:`${item} стоит ${price} руб. Скидка ${percent}%. Сколько рублей нужно заплатить на кассе?`, answer:String(discounted), options:generateOptions(discounted), explanation:`Скидка = ${price} * ${percent}/100 = ${discount} руб. Новая цена = ${price} - ${discount} = ${discounted} руб.`, type:"math"};
+            }
+        }
+
+        if (type==="simple_interest") {
+            let years=randInt(1,10), rate=randInt(10,15), deposit=pickCleanDeposit(800,50000,rate,years);
+            if(deposit>=1500) deposit=Math.round(deposit/5)*5;
+            let interest=deposit*rate*years/100;
+            return {text:`Вклад ${deposit} руб. под ${rate}% годовых на ${years} лет (простой процент). Сколько рублей процентов начислит банк за весь срок?`, answer:String(interest), options:generateOptions(interest), explanation:`Годовой процент = ${deposit*rate/100} руб. За ${years} лет: ${deposit*rate/100} * ${years} = ${interest} руб.`, type:"math"};
+        }
+
+        if (type==="tax_calc") {
+            let income = randInt(4,30)*100;
+            let tax = income*13/100;
+            let question = `Зарплата составляет ${income} руб. Ставка подоходного налога 13%. Сколько рублей налога удержат?`;
+            let answer = tax;
+            let explanation = `Налог = ${income} * 13/100 = ${tax} руб.`;
+            if (difficulty==="hard" && Math.random()<0.5) {
+                let pensRate = [5,10,15,20,25,30][Math.floor(Math.random()*6)]/10;
+                let pens = Math.round(income * pensRate / 100);
+                question += `\nКроме того, обязательный пенсионный взнос составляет ${pensRate}%.`;
+                answer = tax + pens;
+                explanation = `Подоходный: ${tax} руб.\nПенсионный: ${pens} руб.\nВсего удержат: ${tax}+${pens}=${answer} руб.`;
+            }
+            return {text:question, answer:String(answer), options:generateOptions(answer), explanation, type:"math"};
+        }
+
+        if (type==="budget_split") {
+            let budget = randInt(35,65)*100;
+            let rent = randInt(5, Math.min(25, (budget-1000)/100))*100;
+            let food = randInt(2, Math.min(15, (budget-rent-500)/100))*100;
+            let utils = randInt(1, Math.min(5, (budget-rent-food-300)/100))*100;
+            let transport = randInt(1, Math.min(5, (budget-rent-food-utils-100)/100))*100;
+            let rest = budget - rent - food - utils - transport;
+            if (rest < budget*0.1) rent = Math.max(500, rent - Math.ceil((budget*0.1-rest)/100)*100);
+            let r = Math.random();
+            let spend, catName;
+            if (r<0.25) { spend=rent; catName="аренду"; }
+            else if (r<0.5) { spend=food; catName="питание"; }
+            else if (r<0.75) { spend=utils; catName="коммунальные"; }
+            else { spend=transport; catName="транспорт"; }
+            let percent = Math.round(spend/budget*100);
+            return {text:`Бюджет семьи составляет ${budget} руб. На ${catName} уходит ${spend} руб. Сколько процентов от бюджета это составляет?`, answer:String(percent), options:generateOptions(percent), explanation:`${spend} / ${budget} * 100% = ${percent}%`, type:"math"};
+        }
+
+        if (type==="cashback") {
+            let item=ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)], price=generatePrice(item);
+            if(price>=1500) price=Math.round(price/5)*5;
+            let cbPercentArray = [5,10,15,20,25,30,35,40,45,50,55,60,65,70];
+            let cbPercent = cbPercentArray[Math.floor(Math.random()*cbPercentArray.length)]/10;
+            let cash = Math.round(price*cbPercent/100);
+            let {name, isMale} = randName();
+            return {text:`${name} купил${isMale?'':'а'} ${item} за ${price} руб. Кэшбэк по карте составляет ${cbPercent}%. Сколько рублей вернётся на карту?`, answer:String(cash), options:generateOptions(cash), explanation:`Кэшбэк = ${price} * ${cbPercent}/100 ≈ ${cash} руб.`, type:"math"};
+        }
+
+        if (type==="currency_exchange") {
+            let currency = Math.random()<0.5 ? "доллар" : "евро";
+            let rateBase = randInt(300,360); let rate = rateBase/100;
+            let g = gcd(rateBase,100); let step = 100/g;
+            let amount = step * randInt(Math.ceil(1/step), Math.floor(600/step));
+            let total = amount*rateBase/100;
+            return {text:`Нужно купить ${amount} ${currency}. Курс ${currency} — ${rate.toFixed(2)} руб. Сколько белорусских рублей потребуется?`, answer:String(total), options:generateOptions(total), explanation:`${amount} × ${rate.toFixed(2)} = ${total} руб.`, type:"math"};
+        }
+
+        if (type==="vat_calc") {
+            let item=ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)];
+            let [lo,hi]=ITEMS[item];
+            let price = pickStepValue(lo, hi, 6);
+            let vat = price / 6;
+            let {name, isMale} = randName();
+            return {text:`${name} купил${isMale?'':'а'} ${item} за ${price} руб. (цена включает НДС 20%). Сколько рублей из этой суммы получит государство в виде НДС?`, answer:String(vat), options:generateOptions(vat), explanation:`НДС = ${price} / 120 * 20 = ${vat} руб.`, type:"math"};
+        }
+
+        if (type==="installment") {
+            let item=ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)], months=randInt(5,24);
+            let [lo,hi]=ITEMS[item];
+            let price = pickStepValue(Math.max(500, lo), hi, months);
+            let monthly = price / months;
+            return {text:`${item} стоит ${price} руб. Магазин предлагает рассрочку на ${months} месяцев без переплаты. Сколько рублей нужно платить в месяц?`, answer:String(monthly), options:generateOptions(monthly), explanation:`${price} / ${months} = ${monthly} руб./мес.`, type:"math"};
+        }
+
+        if (type==="inflation") {
+            let item=ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)], price=generatePrice(item);
+            while(price<=500) price=generatePrice(item);
+            let inf=randInt(3,8), newPrice=Math.round(price*(1+inf/100));
+            let {name} = randName();
+            return {text:`${name} хочет купить ${item} через год. Сейчас товар стоит ${price} руб. Ожидается инфляция ${inf}%. Сколько примерно рублей будет стоить товар через год?`, answer:String(newPrice), options:generateOptions(newPrice), explanation:`${price} × 1.${inf} ≈ ${newPrice} руб.`, type:"math"};
+        }
+
+        if (type==="savings_goal_months") {
+            let item=ITEM_NAMES[Math.floor(Math.random()*ITEM_NAMES.length)];
+            let target = generatePrice(item);
+            target = Math.max(150, Math.min(600, target));
+            let monthly = randInt(3, 15) * 10;
+            let fullMonths = Math.ceil(target/monthly);
+            return {text:`Вы хотите накопить на ${item} стоимостью ${target} руб., откладывая по ${monthly} руб. в месяц. Через сколько месяцев цель будет достигнута?`, answer:String(fullMonths), options:generateOptions(fullMonths), explanation:`Потребуется ${fullMonths} месяцев (${target}/${monthly} ≈ ${(target/monthly).toFixed(1)})`, type:"math"};
+        }
+
+        if (type==="loan_interest") {
+            let loanBase = randInt(10,800)*100, rate=randInt(10,20), interest=loanBase*rate/100;
+            let itemName = loanBase<30000 ? "подержанный автомобиль" : "автомобиль";
+            if (Math.random()<0.5) { let electronics=["смартфон","робот-пылесос"]; itemName=electronics[Math.floor(Math.random()*2)]; loanBase=randInt(25,400)*100; interest=loanBase*rate/100; }
+            return {text:`Взят кредит на ${itemName} в размере ${loanBase} руб. на год под ${rate}% годовых. Сколько рублей составят проценты по кредиту?`, answer:String(interest), options:generateOptions(interest), explanation:`${loanBase} * ${rate}/100 = ${interest} руб.`, type:"math"};
+        }
+
+        if (type==="compound_2y") {
+            let rate=randInt(10,15);
+            let step = 100 / gcd(100, rate);
+            let deposit = pickStepValue(1500, 50000, step);
+            let year1 = deposit + deposit*rate/100, year2 = year1 + year1*rate/100;
+            return {text:`Вклад ${deposit} руб. на 2 года с ежегодной капитализацией под ${rate}%. Какая сумма будет на счету через 2 года?`, answer:String(year2), options:generateOptions(year2), explanation:`1-й год: ${deposit} + ${deposit*rate/100} = ${year1} руб.\n2-й год: ${year1} + ${year1*rate/100} = ${year2} руб.`, type:"math"};
+        }
+
+    } catch(e) { console.error(e); }
+
+    return {text:"Сколько будет 20% от 500?", answer:"100", options:["80","90","100","110"], explanation:"500×0.2=100", type:"math"};
+  };
+
+  // ===== ГЕНЕРАТОРЫ ГРАФИКОВ =====
+  const getCanvasBg = () => document.body.classList.contains('dark') ? '#2c3038' : '#ffffff';
+  const getCanvasTextColor = () => document.body.classList.contains('dark') ? '#ddd' : '#333';
+  const getCanvasGridColor = () => document.body.classList.contains('dark') ? '#555' : '#ccc';
+  const safeCanvasToDataURL = (canvas) => { try { return canvas.toDataURL('image/png'); } catch(e) { return ''; } };
+
+  const generateBarChartQuestion = () => {
+    try {
+      const canvas = document.createElement('canvas'); canvas.width=400; canvas.height=250; const ctx=canvas.getContext('2d');
+      const categories = ['Продукты', 'Транспорт', 'Жильё', 'Развлечения'];
+      const values = categories.map(() => randInt(200, 900));
+      const total = values.reduce((a,b)=>a+b,0);
+      const maxVal = Math.max(...values), maxIdx = values.indexOf(maxVal);
+      const minVal = Math.min(...values), minIdx = values.indexOf(minVal);
+      const qType = randInt(1,3);
+      let question, answer, explanation;
+      if (qType===1) {
+        question = 'На какую категорию потрачено больше всего?';
+        answer = categories[maxIdx];
+        explanation = `Максимальные расходы — ${answer} (${maxVal} руб.)`;
+      } else if (qType===2) {
+        question = 'Сколько всего рублей потрачено за месяц?';
+        answer = total;
+        explanation = `Сумма всех расходов: ${categories.map((c,i)=>`${c}: ${values[i]}`).join(', ')} = ${total} руб.`;
+      } else {
+        const diff = maxVal - minVal;
+        question = `На сколько рублей расходы на ${categories[maxIdx]} больше, чем на ${categories[minIdx]}?`;
+        answer = diff;
+        explanation = `${categories[maxIdx]} (${maxVal}) − ${categories[minIdx]} (${minVal}) = ${diff} руб.`;
+      }
+
+      ctx.fillStyle = getCanvasBg(); ctx.fillRect(0,0,400,250);
+      const barWidth=50, spacing=30, startX=30, chartBottom=220, chartHeight=180;
+      const colors=['#4e79a7','#f28e2b','#e15759','#76b7b2'];
+      ctx.fillStyle=getCanvasTextColor(); ctx.font='12px Inter, sans-serif'; ctx.fillText('Расходы за месяц', 130, 240);
+      ctx.beginPath(); ctx.moveTo(30,30); ctx.lineTo(30,chartBottom); ctx.lineTo(380,chartBottom);
+      ctx.strokeStyle=getCanvasGridColor(); ctx.stroke();
+      ctx.fillStyle=getCanvasTextColor(); ctx.font='10px Inter, sans-serif';
+      for (let v=0; v<=1000; v+=200) {
+        const y = chartBottom - (v/1000)*chartHeight;
+        ctx.fillText(v, 5, y+3);
+        ctx.beginPath(); ctx.moveTo(28,y); ctx.lineTo(380,y);
+        ctx.strokeStyle=getCanvasGridColor(); ctx.stroke();
+      }
+      categories.forEach((cat,i) => {
+        const x = startX + i*(barWidth+spacing);
+        const barH = (values[i]/1000)*chartHeight;
+        const y = chartBottom - barH;
+        ctx.fillStyle = colors[i%colors.length];
+        ctx.fillRect(x, y, barWidth, barH);
+        ctx.fillStyle=getCanvasTextColor(); ctx.font='11px Inter, sans-serif'; ctx.textAlign='center';
+        ctx.fillText(cat, x+barWidth/2, chartBottom+15);
+        ctx.fillText(values[i], x+barWidth/2, y-5);
+      });
+      const dataURL = safeCanvasToDataURL(canvas);
+      return { text: `${question}<br>${dataURL ? `<img src="${dataURL}" class="chart-image">` : ''}`, answer: String(answer), options: qType===1 ? shuffleArray([...categories]) : generateOptions(answer), explanation, type:'bar' };
+    } catch(e) { return {text:"Не удалось построить диаграмму.", answer:"0", options:["0"], explanation:"", type:'bar'}; }
+  };
+
+  const generatePieChartQuestion = () => {
+    try {
+      const canvas = document.createElement('canvas'); canvas.width=400; canvas.height=280; const ctx=canvas.getContext('2d');
+      const categorySets = [
+        { cats: ['Продукты', 'Проезд', 'Квартплата', 'Связь'], title: 'Распределение расходов семьи' },
+        { cats: ['Еда вне дома', 'Одежда', 'Техника', 'Спорт'], title: 'Бюджет студента' }
+      ];
+      const set = categorySets[Math.floor(Math.random()*categorySets.length)];
+      const categories = set.cats;
+      let percentages = [], remaining = 100;
+      for (let i=0; i<categories.length-1; i++) {
+        const p = randInt(10, remaining - (categories.length-i-1)*5);
+        percentages.push(p);
+        remaining -= p;
+      }
+      percentages.push(remaining);
+      const combined = categories.map((c,i)=>({c,p:percentages[i]}));
+      shuffleArray(combined);
+      const finalCats = combined.map(x=>x.c), finalPercents = combined.map(x=>x.p);
+      const maxP = Math.max(...finalPercents), maxIdx = finalPercents.indexOf(maxP);
+      const qType = randInt(1,2);
+      let question, answer, explanation;
+      if (qType===1) {
+        question = 'Какая категория занимает наибольшую долю бюджета?';
+        answer = finalCats[maxIdx];
+        explanation = `Самый большой сектор — ${answer} (${maxP}%)`;
+      } else {
+        const idx = randInt(0, finalCats.length-1);
+        question = `Сколько процентов бюджета приходится на «${finalCats[idx]}»?`;
+        answer = finalPercents[idx];
+        explanation = `Сектор «${finalCats[idx]}» занимает ${answer}% на диаграмме.`;
+      }
+
+      ctx.fillStyle = getCanvasBg(); ctx.fillRect(0,0,400,280);
+      const centerX=180, centerY=140, radius=100;
+      const colors=['#5470c6','#ee6666','#fac858','#73c0de','#3ba272','#fc8452','#9a60b4'];
+      let startAngle = -Math.PI/2;
+      finalPercents.forEach((p,i)=>{
+        const sliceAngle = (p/100)*2*Math.PI;
+        ctx.beginPath(); ctx.moveTo(centerX,centerY); ctx.arc(centerX,centerY,radius,startAngle,startAngle+sliceAngle);
+        ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+        ctx.strokeStyle=getCanvasBg(); ctx.lineWidth=2; ctx.stroke();
+        const midAngle = startAngle+sliceAngle/2;
+        const labelX = centerX+Math.cos(midAngle)*(radius*0.65);
+        const labelY = centerY+Math.sin(midAngle)*(radius*0.65);
+        ctx.fillStyle='#fff'; ctx.font='bold 13px Inter'; ctx.textAlign='center'; ctx.fillText(`${p}%`, labelX, labelY+4);
+        startAngle += sliceAngle;
+      });
+      let legendX=310, legendY=70;
+      ctx.font='12px Inter'; ctx.textAlign='left';
+      finalCats.forEach((cat,i)=>{
+        ctx.fillStyle=colors[i%colors.length]; ctx.fillRect(legendX, legendY, 12, 12);
+        ctx.fillStyle=getCanvasTextColor(); ctx.fillText(cat, legendX+18, legendY+10);
+        legendY += 22;
+      });
+      const dataURL = safeCanvasToDataURL(canvas);
+      return { text: `${question}<br>${dataURL ? `<img src="${dataURL}" class="chart-image">` : ''}`, answer: String(answer), options: qType===1 ? shuffleArray([...finalCats]) : generateOptions(answer), explanation, type:'pie' };
+    } catch(e) { return {text:"Не удалось построить диаграмму.", answer:"0", options:["0"], explanation:"", type:'pie'}; }
+  };
+
+  const generateLineGraphQuestion = () => {
+    try {
+      const canvas = document.createElement('canvas'); canvas.width=500; canvas.height=280; const ctx=canvas.getContext('2d');
+      const scenarios = [
+        { title: 'Динамика вклада за 6 месяцев (тыс. руб.)', labels: ['Янв','Фев','Мар','Апр','Май','Июн'] },
+        { title: 'Курс доллара за неделю (руб.)', labels: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] }
+      ];
+      const scenario = scenarios[Math.floor(Math.random()*scenarios.length)];
+      const labels = scenario.labels, n = labels.length;
+      let values = [randInt(20,60)];
+      for (let i=1; i<n; i++) {
+        let delta = randInt(-8,8);
+        let next = values[i-1] + delta;
+        next = Math.max(5, Math.min(100, next));
+        values.push(next);
+      }
+      const maxVal = Math.max(...values), maxIdx = values.indexOf(maxVal);
+      const qType = randInt(1,3);
+      let question, answer, explanation;
+      if (qType===1) {
+        question = `В каком месяце (по графику) было наибольшее значение?`;
+        answer = labels[maxIdx];
+        explanation = `Наивысшая точка — ${answer} (${maxVal})`;
+      } else if (qType===2) {
+        const total = values.reduce((a,b)=>a+b,0);
+        question = 'Чему равна сумма всех значений на графике?';
+        answer = total;
+        explanation = `Сумма = ${values.join('+')} = ${total}`;
+      } else {
+        const diff = values[n-1] - values[0];
+        question = `На сколько изменилось значение с ${labels[0]} до ${labels[n-1]}?`;
+        answer = diff;
+        explanation = `С ${labels[0]}: ${values[0]}, до ${labels[n-1]}: ${values[n-1]}, изменение = ${diff}`;
+      }
+
+      ctx.fillStyle = getCanvasBg(); ctx.fillRect(0,0,500,280);
+      const padding={top:30,right:30,bottom:40,left:40}, chartW=500-padding.left-padding.right, chartH=280-padding.top-padding.bottom;
+      const xStep = chartW/(n-1);
+      ctx.beginPath(); ctx.moveTo(padding.left, padding.top); ctx.lineTo(padding.left, padding.top+chartH); ctx.lineTo(padding.left+chartW, padding.top+chartH);
+      ctx.strokeStyle=getCanvasGridColor(); ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle=getCanvasTextColor(); ctx.font='10px Inter';
+      for (let v=0; v<=100; v+=20) {
+        const y = padding.top+chartH - (v/100)*chartH;
+        ctx.fillText(v, padding.left-30, y+3);
+        ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left+chartW, y);
+        ctx.strokeStyle=getCanvasGridColor(); ctx.stroke();
+      }
+      ctx.textAlign='center'; ctx.fillStyle=getCanvasTextColor(); ctx.font='11px Inter';
+      labels.forEach((l,i)=>{ const x=padding.left+i*xStep; ctx.fillText(l, x, padding.top+chartH+20); });
+      ctx.beginPath(); ctx.strokeStyle='#2c6280'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+      for (let i=0;i<n;i++) { const x=padding.left+i*xStep, y=padding.top+chartH-(values[i]/100)*chartH; i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y); }
+      ctx.stroke();
+      values.forEach((val,i)=>{
+        const x=padding.left+i*xStep, y=padding.top+chartH-(val/100)*chartH;
+        ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fillStyle='#2c6280'; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=getCanvasTextColor(); ctx.font='bold 10px Inter'; ctx.textAlign='center'; ctx.fillText(val, x, y-10);
+      });
+      const dataURL = safeCanvasToDataURL(canvas);
+      return { text: `${question}<br>${dataURL ? `<img src="${dataURL}" class="chart-image">` : ''}`, answer: String(answer), options: (qType===1) ? shuffleArray([...labels]) : generateOptions(answer), explanation, type:'line' };
+    } catch(e) { return {text:"Не удалось построить график.", answer:"0", options:["0"], explanation:"", type:'line'}; }
+  };
+
+  // ===== СБОРЩИК ТЕСТА =====
+  function buildTest(difficulty) {
+    if (difficulty === "easy") {
+      let easyQuiz = RAW_QUESTIONS.filter(q => q.level==="easy" && q.type==="quiz");
+      return shuffleArray([...easyQuiz]).slice(0, 10);
+    } else {
+      let quizPool = RAW_QUESTIONS.filter(q => q.level===difficulty && q.type==="quiz");
+      let selectedQuiz = shuffleArray([...quizPool]).slice(0, 5);
+      let dynamicTasks = [];
+      for (let i=0; i<5; i++) {
+        try { dynamicTasks.push(generateDynamicQuestion(difficulty, 0)); }
+        catch(e) { dynamicTasks.push({text:"Сколько будет 20% от 500?", answer:"100", options:["80","90","100","110"], explanation:"500×0.2=100", type:"math"}); }
+      }
+      let questions = [];
+      for (let i=0; i<5; i++) { questions.push(selectedQuiz[i]); questions.push(dynamicTasks[i]); }
+      return questions;
+    }
+  }
+
+  // ===== UI ФУНКЦИИ =====
+  function askDifficulty() {
+    safeRender("app", `
+      <div class="user-name">👤 ${currentUser}</div>
+      <h2>Выберите сложность</h2>
+      <div class="menu-grid">
+        <button class="btn" id="easyBtn">🟢 1–4 классы</button>
+        <button class="btn" id="middleBtn">🟡 5–7 классы</button>
+        <button class="btn" id="hardBtn">🔴 8+ классы</button>
+        <button class="btn" id="backBtn">◀️ Назад</button>
+      </div>`);
+    document.getElementById("easyBtn").onclick = () => startQuizSession("easy");
+    document.getElementById("middleBtn").onclick = () => startQuizSession("middle");
+    document.getElementById("hardBtn").onclick = () => startQuizSession("hard");
+    document.getElementById("backBtn").onclick = renderMainMenu;
+  }
+
+  let appState = { mode:"menu", quizSession:null };
+  let infiniteStreak = 0, infiniteScore = 0;
+
+  function startQuizSession(diff) {
+    const questions = buildTest(diff);
+    appState = { mode:"quiz", quizSession: { questions, currentIndex:0, score:0, correctQuiz:0, correctMath:0, total:questions.length, difficulty:diff } };
+    renderQuizQuestion();
+  }
+
+  function renderQuizQuestion() {
+    const session = appState.quizSession;
+    if (!session || session.currentIndex >= session.questions.length) return finishQuiz();
+    const q = session.questions[session.currentIndex];
+    const isQuiz = q.type === "quiz";
+    const prefix = isQuiz ? "📚 Вопрос" : "🧮 Задача";
+    const shuffledOptions = isQuiz ? shuffleArray([...q.options]) : q.options;
+    const html = `
+      <div class="user-name">👤 ${currentUser}</div>
+      <div class="stats-bar"><span>${prefix} ${session.currentIndex+1}/${session.total}</span><span>Очки: ${session.score}</span></div>
+      <div class="question-pane">
+        <div class="q-text">${q.text}</div>
+        <div class="options-list" id="optionsList"></div>
+      </div>
+      <button class="btn" id="exitQuizBtn">🚪 Выйти в меню</button>
+    `;
+    safeRender("app", html);
+    const container = document.getElementById("optionsList");
+    shuffledOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn"; btn.innerText = opt;
+      btn.onclick = () => handleQuizAnswer(opt);
+      container.appendChild(btn);
+    });
+    document.getElementById("exitQuizBtn").onclick = renderMainMenu;
+  }
+
+  function handleQuizAnswer(selected) {
+    const session = appState.quizSession;
+    if (!session) return;
+    const q = session.questions[session.currentIndex];
+    const isCorrect = (selected === q.answer);
+    if (isCorrect) { session.score++; if (q.type === "quiz") session.correctQuiz++; else session.correctMath++; }
+    const feedback = isCorrect ? "✅ Правильно!" : `❌ Неправильно. Ответ: ${q.answer}`;
+    const explanation = q.explanation ? `💡 ${q.explanation}` : "";
+    const htmlExtra = `
+      <div class="feedback ${isCorrect ? 'correct-fb' : 'wrong-fb'}"><b>${feedback}</b><br>${explanation}</div>
+      <button class="btn btn-primary" id="nextBtn">${session.currentIndex+1 === session.total ? "🏁 Завершить" : "➡️ Следующий вопрос"}</button>
+    `;
+    const optionsDiv = document.querySelector(".options-list");
+    if (optionsDiv) optionsDiv.style.display = "none";
+    if (!document.querySelector(".feedback")) {
+      const pane = document.querySelector(".question-pane");
+      pane.insertAdjacentHTML("beforeend", htmlExtra);
+      document.getElementById("nextBtn").onclick = () => {
+        session.currentIndex++;
+        if (session.currentIndex >= session.total) finishQuiz();
+        else renderQuizQuestion();
+      };
+    }
+  }
+
+  function finishQuiz() {
+    const session = appState.quizSession;
+    updateUserProfile(session.score, session.total, session.difficulty);
+    const comment = session.score === session.total ? "🏅 Идеально!" : (session.score >= session.total/2 ? "👍 Хорошо" : "📘 Тренируйся больше");
+    safeRender("app", `
+      <div class="result-screen">
+        <h2>📊 Тест завершён</h2>
+        <div class="big-score">${session.score}/${session.total}</div>
+        <p>${comment}</p>
+        <div class="grid-2">
+          <button class="btn" id="menuBtn">🏠 Главное меню</button>
+          <button class="btn btn-primary" id="retryBtn">🔄 Пройти заново</button>
+        </div>
+      </div>`);
+    document.getElementById("menuBtn").onclick = renderMainMenu;
+    document.getElementById("retryBtn").onclick = () => startQuizSession(session.difficulty);
+    appState.mode = "menu";
+  }
+
+  function startRandomTask() {
+    const task = generateDynamicQuestion("hard");
+    renderRandomTaskUI(task);
+  }
+  function renderRandomTaskUI(task) {
+    const html = `
+      <div class="user-name">👤 ${currentUser}</div>
+      <h2>🎲 Случайная задача</h2>
+      <div class="question-pane">
+        <div class="q-text">${task.text}</div>
+        <div class="options-list" id="optionsRand"></div>
+      </div>
+      <button class="btn" id="backRand">◀️ В меню</button>
+    `;
+    safeRender("app", html);
+    const container = document.getElementById("optionsRand");
+    const shuffled = shuffleArray([...task.options]);
+    shuffled.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn"; btn.textContent = opt;
+      btn.onclick = () => {
+        const isCorrect = (opt === task.answer);
+        container.innerHTML = `<div class="feedback ${isCorrect?'correct-fb':'wrong-fb'}">${isCorrect?'✅ Верно!':'❌ Ошибка. Ответ: '+task.answer}<br>💡 ${task.explanation}</div>`;
+        if (isCorrect) updateUserProfile(1,1,"random");
+        document.querySelectorAll(".opt-btn").forEach(b => b.disabled = true);
+      };
+      container.appendChild(btn);
+    });
+    document.getElementById("backRand").onclick = renderMainMenu;
+  }
+
+  function startInfinite() { infiniteStreak=0; infiniteScore=0; nextInfiniteQuestion(); }
+  function nextInfiniteQuestion() {
+    const question = generateDynamicQuestion("middle", infiniteStreak);
+    const html = `
+      <div class="user-name">👤 ${currentUser}</div>
+      <div class="stats-bar"><span>🔥 Серия: ${infiniteStreak}</span><span>🏆 Всего верно: ${infiniteScore}</span></div>
+      <div class="question-pane">
+        <div class="q-text">${question.text}</div>
+        <div class="options-list" id="infOptions"></div>
+      </div>
+      <button class="btn" id="stopInfBtn">⏹️ Закончить тренировку</button>
+    `;
+    safeRender("app", html);
+    const container = document.getElementById("infOptions");
+    const shuffled = shuffleArray([...question.options]);
+    shuffled.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn"; btn.textContent = opt;
+      btn.onclick = () => {
+        if (opt === question.answer) {
+          infiniteStreak++; infiniteScore++;
+          updateMaxStreak(infiniteStreak);
+          nextInfiniteQuestion();
+        } else {
+          const fbDiv = document.createElement("div");
+          fbDiv.className = "feedback wrong-fb";
+          fbDiv.innerHTML = `❌ Неправильно! Ответ: ${question.answer}<br>💡 ${question.explanation}<br>🔥 Серия прервана. Всего правильных: ${infiniteScore}`;
+          container.innerHTML = ""; container.appendChild(fbDiv);
+          document.querySelectorAll(".opt-btn").forEach(b => b.disabled = true);
+          document.getElementById("stopInfBtn")?.remove();
+          const btnDiv = document.createElement("div"); btnDiv.className = "grid-2";
+          btnDiv.innerHTML = `<button class="btn" id="restartInfBtn">🔄 Заново</button><button class="btn" id="menuFromInfBtn">🏠 Главное меню</button>`;
+          document.querySelector(".question-pane").appendChild(btnDiv);
+          document.getElementById("restartInfBtn").onclick = startInfinite;
+          document.getElementById("menuFromInfBtn").onclick = renderMainMenu;
+        }
+      };
+      container.appendChild(btn);
+    });
+    document.getElementById("stopInfBtn").onclick = renderMainMenu;
+  }
+
+  function startChartMode() {
+    const generators = [generateBarChartQuestion, generatePieChartQuestion, generateLineGraphQuestion];
+    const task = generators[Math.floor(Math.random()*generators.length)]();
+    renderChartTaskUI(task);
+  }
+  function renderChartTaskUI(task) {
+    const typeNames = { bar:'Столбчатая диаграмма', pie:'Круговая диаграмма', line:'Линейный график' };
+    const html = `
+      <div class="user-name">👤 ${currentUser}</div>
+      <h2>📊 ${typeNames[task.type]}</h2>
+      <div class="question-pane">
+        <div class="q-text">${task.text}</div>
+        <div class="options-list" id="chartOptions"></div>
+        <div id="chartFeedback"></div>
+        <button class="btn btn-primary" id="nextChartBtn" style="display:none;">🔄 Новая задача</button>
+      </div>
+      <button class="btn" id="backChartBtn">◀️ В меню</button>
+    `;
+    safeRender("app", html);
+    const container = document.getElementById("chartOptions");
+    task.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn"; btn.textContent = opt;
+      btn.onclick = () => {
+        const isCorrect = (opt === task.answer);
+        document.querySelectorAll(".opt-btn").forEach(b => b.disabled = true);
+        document.getElementById("chartFeedback").innerHTML = `<div class="feedback ${isCorrect?'correct-fb':'wrong-fb'}">${isCorrect?'✅ Правильно!':'❌ Ошибка. Ответ: '+task.answer}<br>${task.explanation}</div>`;
+        document.getElementById("nextChartBtn").style.display = 'inline-block';
+        if (isCorrect) updateUserProfile(1,1,"chart");
+      };
+      container.appendChild(btn);
+    });
+    document.getElementById("nextChartBtn").onclick = startChartMode;
+    document.getElementById("backChartBtn").onclick = renderMainMenu;
+  }
+
+  function showAchievements() {
+    const list = getAchievements();
+    const items = list.length ? list.map(a=>`★ ${a}`).join("<br>") : "Пока нет достижений.";
+    safeRender("app", `<div class="user-name">👤 ${currentUser}</div><h2>🏅 Мои достижения</h2><div class="question-pane">${items}</div><button class="btn" id="achBack">Назад</button>`);
+    document.getElementById("achBack").onclick = renderMainMenu;
+  }
+  function showProfile() {
+    const s = getStats();
+    const accuracy = s.avgAcc ? Math.round(s.avgAcc*100) : 0;
+    safeRender("app", `
+      <div class="user-name">👤 ${currentUser}</div>
+      <h2>📊 Мой профиль</h2>
+      <div class="question-pane">
+        📋 Пройдено тестов: ${s.totalTests||0}<br>
+        🏆 Лучший результат: ${s.bestScore||0}/${s.bestTotal||0}<br>
+        📉 Последний результат: ${s.lastScore||0}/${s.lastTotal||0}<br>
+        🎯 Средняя точность: ${accuracy}%<br>
+        🔥 Рекорд серии: ${s.maxStreak||0}
+      </div>
+      <button class="btn" id="profBack">Назад</button>`);
+    document.getElementById("profBack").onclick = renderMainMenu;
+  }
+
+  // ===== ГЛАВНОЕ МЕНЮ =====
+  function renderMainMenu() {
+    const html = `
+      <div class="theme-toggle">
+        <label class="toggle-label">
+          <input type="checkbox" id="themeCheckbox" ${document.body.classList.contains('dark')?'checked':''}>
+          <span class="slider"><span class="slider-icons"><span class="sun">☀️</span><span class="moon">🌙</span></span></span>
+        </label>
+      </div>
+      <div class="user-name">👤 ${currentUser}</div>
+      <h1>💰 FinTest</h1>
+      <div class="sub">Финансовая грамотность + живая генерация задач</div>
+      <div class="menu-grid">
+        <button class="btn" id="startTestBtn">▶️ Начать тест</button>
+        <button class="btn" id="randomTaskBtn">🎲 Случайная задача</button>
+        <button class="btn" id="infiniteBtn">♾️ Бесконечная тренировка</button>
+        <button class="btn" id="chartModeBtn">📊 Диаграммы и графики</button>
+        <button class="btn" id="achievementsBtn">🏅 Достижения</button>
+        <button class="btn" id="profileBtn">👤 Мой профиль</button>
+      </div>
+    `;
+    safeRender("app", html);
+    document.getElementById("startTestBtn").onclick = () => askDifficulty();
+    document.getElementById("randomTaskBtn").onclick = startRandomTask;
+    document.getElementById("infiniteBtn").onclick = startInfinite;
+    document.getElementById("chartModeBtn").onclick = startChartMode;
+    document.getElementById("achievementsBtn").onclick = showAchievements;
+    document.getElementById("profileBtn").onclick = showProfile;
+    document.getElementById("themeCheckbox").addEventListener('change', (e) => {
+      document.body.classList.toggle('dark', e.target.checked);
+      safeSet('fintest_theme', e.target.checked ? 'dark' : 'light');
+      renderMainMenu();
+    });
+  }
+
+  // ===== ИНИЦИАЛИЗАЦИЯ =====
+  const savedUser = safeGet("fintest_user");
+  if (savedUser && savedUser.trim() !== "") {
+    currentUser = savedUser;
+    renderMainMenu();
+  } else {
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="modal" id="nameModal">
+        <div class="modal-card">
+          <h3>🏦 Добро пожаловать в FinTest!</h3>
+          <p style="margin:10px 0">Представьтесь, пожалуйста:</p>
+          <input type="text" id="userNameInput" placeholder="Ваше имя" autocomplete="off">
+          <button class="btn btn-primary" id="saveNameBtn">Продолжить</button>
+        </div>
+      </div>`);
+    document.getElementById("saveNameBtn").onclick = () => {
+      const name = document.getElementById("userNameInput").value.trim();
+      if (!name) { alert("Введите имя"); return; }
+      currentUser = name;
+      safeSet("fintest_user", name);
+      document.getElementById("nameModal").remove();
+      renderMainMenu();
+    };
+  }
+
+  if (safeGet("fintest_theme") === "dark") document.body.classList.add("dark");
+</script>
+</body>
+</html>
